@@ -91,6 +91,16 @@ public class AddController {
         return false;
     }
 
+    private void clearFields() {
+        for (Object inputField : inputFields) {
+            if (inputField instanceof TextField) {
+                ((TextField) inputField).setText("");
+            } else if (inputField instanceof ComboBox) {
+                ((ComboBox) inputField).getSelectionModel().select(-1);
+            }
+        }
+    }
+
     private Object[] getParamsFromFields(Class c, Class[] classes, List<Object> inputFields) {
         Object[] params = new Object[ClassParser.getFieldsCount(c)];
         for (int i = 0; i < inputFields.size(); i++) {
@@ -119,6 +129,7 @@ public class AddController {
                     Object instance = ClassParser.getFullConstructor(selectedClass).newInstance(params);
                     Controller.controller.updateTable(instance);
                 }
+                clearFields();
             } catch (ClassNotFoundException | InstantiationException | IllegalAccessException |
                     InvocationTargetException e) {
                 e.printStackTrace();
