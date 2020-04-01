@@ -7,10 +7,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 
 import java.io.IOException;
@@ -43,6 +40,13 @@ public class AddController {
         bConfirm.setDisable(true);
     }
 
+    private void showAlert(Alert.AlertType type, String header, String content) {
+        Alert alert = new Alert(type);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        alert.show();
+    }
+
     private Object resolveFieldType(Field field) {
         if (field.getType().isPrimitive() || field.getType().equals(String.class)) {
             return new TextField();
@@ -72,20 +76,53 @@ public class AddController {
         }
     }
 
+    private boolean inputFieldsIsEmpty() {
+        for (Object inputField : inputFields) {
+            if (inputField instanceof TextField) {
+                if (((TextField) inputField).getText().isEmpty()) {
+                    return true;
+                }
+            } else if (inputField instanceof ComboBox) {
+                if (((String) ((ComboBox) inputField).getValue()).isEmpty()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private Object[] getParamsFromFields(Class c, Class[] classes, List<Object> inputFields) {
+        Object[] params = new Object[ClassParser.getFieldsCount(c)];
+        for (int i = 0; i < inputFields.size(); i++) {
+            try {
+                params[i] = ClassParser.parseField(c, inputFields.get(i), classes[i]);
+            } catch (NumberFormatException e) {
+                ((TextField) inputFields.get(i)).setText("");
+                showAlert(Alert.AlertType.ERROR, "Type Mismatch Error",
+                        "Some fields have invalid values");
+                return null;
+            }
+        }
+        return params;
+    }
+
     @FXML
     void onConfirmPressAction(ActionEvent event) {
-        try {
-            Class selectedClass = Class.forName(cbClasses.getValue());
-            Class[] classes = ClassParser.getAllTypesOfFields(selectedClass);
-            Object[] params = new Object[ClassParser.getFieldsCount(selectedClass)];
-            for (int i = 0; i < inputFields.size(); i++) {
-                params[i] = ClassParser.parseField(selectedClass, inputFields.get(i), classes[i]);
+        if (inputFieldsIsEmpty()) {
+            showAlert(Alert.AlertType.ERROR, "Confirmation Error", "All fields must be filled");
+        } else {
+            try {
+                Class selectedClass = Class.forName(cbClasses.getValue());
+                Class[] classes = ClassParser.getAllTypesOfFields(selectedClass);
+                Object[] params = getParamsFromFields(selectedClass, classes, inputFields);
+                if (params != null) {
+                    Object instance = ClassParser.getFullConstructor(selectedClass).newInstance(params);
+                    Controller.controller.updateTable(instance);
+                }
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException |
+                    InvocationTargetException e) {
+                e.printStackTrace();
             }
-            Object instance = ClassParser.getFullConstructor(selectedClass).newInstance(params);
-            Controller.controller.updateTable(instance);
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException |
-                InvocationTargetException e) {
-            e.printStackTrace();
         }
     }
 

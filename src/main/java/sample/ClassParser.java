@@ -57,7 +57,7 @@ public class ClassParser {
         }
     }
 
-    public static Object parseField(Class c, Object inputField, Class fieldType) {
+    public static Object parseField(Class c, Object inputField, Class fieldType) throws NumberFormatException{
         if (inputField instanceof TextField) {
             if (fieldType.equals(int.class)) {
                 return Integer.parseInt(((TextField) inputField).getText());
