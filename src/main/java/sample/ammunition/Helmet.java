@@ -10,19 +10,22 @@ public class Helmet extends Ammunition {
 
     @Title("Helmet type")
     private HelmetType type;
+
     @Title("Number of shells")
     private int numberOfShells;
 
     public HelmetType getType() {
         return type;
     }
-    public int getNumberOfShells() {
-        return numberOfShells;
-    }
 
     public void setType(HelmetType type) {
         this.type = type;
     }
+
+    public int getNumberOfShells() {
+        return numberOfShells;
+    }
+
     public void setNumberOfShells(int numberOfShells) {
         this.numberOfShells = numberOfShells;
     }

@@ -11,19 +11,22 @@ public class Pants extends Ammunition {
 
     @Title("Color")
     private Color color = Color.Black;
+
     @Title("Pocket type")
     private TypeOfPockets pocketType;
 
     public Color getColor() {
         return color;
     }
-    public TypeOfPockets getPocketType() {
-        return pocketType;
-    }
 
     public void setColor(Color color) {
         this.color = color;
     }
+
+    public TypeOfPockets getPocketType() {
+        return pocketType;
+    }
+
     public void setPocketType(TypeOfPockets pocketType) {
         this.pocketType = pocketType;
     }
