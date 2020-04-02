@@ -57,4 +57,14 @@ public class Motorcyclist {
         this.pants = pants;
         this.boots = boots;
     }
+
+    @Override
+    public String toString() {
+        return "Motorcyclist{" +
+                "helmet=" + helmet +
+                ", jacket=" + jacket +
+                ", pants=" + pants +
+                ", boots=" + boots +
+                '}';
+    }
 }
