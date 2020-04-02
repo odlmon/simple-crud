@@ -1,22 +1,16 @@
 package sample;
 
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.ReadOnlyIntegerProperty;
-import javafx.beans.property.ReadOnlyIntegerWrapper;
 import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import sample.attribute.HelmetType;
 import sample.attribute.Size;
 
@@ -61,7 +55,7 @@ public class Controller {
 
     @FXML
     public void initialize() throws ClassNotFoundException,
-            IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
+            IllegalAccessException, InstantiationException, InvocationTargetException {
         String[] classes = getAllClassesInPackage("sample");
         for (String classItem: classes) {
             System.out.println(classItem);

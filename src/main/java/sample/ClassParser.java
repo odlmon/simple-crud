@@ -1,7 +1,5 @@
 package sample;
 
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
 import org.reflections.Reflections;
 import sample.annotation.Entity;
 
@@ -55,29 +53,6 @@ public class ClassParser {
             System.err.println("Error to find or get access to values() method for Enum " + e);
             return null;
         }
-    }
-
-    //remove to controller?
-    public static Object parseField(Class c, Object inputField, Class fieldType) throws NumberFormatException{
-        if (inputField instanceof TextField) {
-            if (fieldType.equals(int.class)) {
-                return Integer.parseInt(((TextField) inputField).getText());
-            } else if (fieldType.equals(String.class)) {
-                return ((TextField) inputField).getText();
-            }
-        } else if (inputField instanceof ComboBox) {
-            Object object = ((ComboBox) inputField).getValue();
-            if (object.getClass().equals(String.class)) {
-                return Enum.valueOf(fieldType, (String) object);
-            }
-            if (object.getClass().equals(Integer.class)) {
-                return Controller.controller.instances
-                        .stream()
-                        .filter(item -> item.hashCode() == (Integer) object)
-                        .findFirst().get();
-            }
-        }
-        return null;
     }
 
     public static int getFieldsCount(Class c) {

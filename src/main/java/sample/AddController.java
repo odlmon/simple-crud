@@ -13,7 +13,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class AddController {
 
@@ -105,11 +104,33 @@ public class AddController {
         }
     }
 
+    private Object parseField(Class c, Object inputField, Class fieldType) throws NumberFormatException{
+        if (inputField instanceof TextField) {
+            if (fieldType.equals(int.class)) {
+                return Integer.parseInt(((TextField) inputField).getText());
+            } else if (fieldType.equals(String.class)) {
+                return ((TextField) inputField).getText();
+            }
+        } else if (inputField instanceof ComboBox) {
+            Object object = ((ComboBox) inputField).getValue();
+            if (object.getClass().equals(String.class)) {
+                return Enum.valueOf(fieldType, (String) object);
+            }
+            if (object.getClass().equals(Integer.class)) {
+                return Controller.controller.instances
+                        .stream()
+                        .filter(item -> item.hashCode() == (Integer) object)
+                        .findFirst().get();
+            }
+        }
+        return null;
+    }
+
     private Object[] getParamsFromFields(Class c, Class[] classes, List<Object> inputFields) {
         Object[] params = new Object[ClassParser.getFieldsCount(c)];
         for (int i = 0; i < inputFields.size(); i++) {
             try {
-                params[i] = ClassParser.parseField(c, inputFields.get(i), classes[i]);
+                params[i] = parseField(c, inputFields.get(i), classes[i]);
             } catch (NumberFormatException e) {
                 ((TextField) inputFields.get(i)).setText("");
                 showAlert(Alert.AlertType.ERROR, "Type Mismatch Error",
