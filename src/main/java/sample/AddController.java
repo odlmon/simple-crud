@@ -13,6 +13,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class AddController {
 
@@ -48,13 +49,18 @@ public class AddController {
     private Object resolveFieldType(Field field) {
         if (field.getType().isPrimitive() || field.getType().equals(String.class)) {
             return new TextField();
-        }
-        if (field.getType().isEnum()) {
-            return new ComboBox<String>(FXCollections.observableArrayList(
+        } else if (field.getType().isEnum()) {
+            return new ComboBox<>(FXCollections.observableArrayList(
                     ClassParser.getAllEnumValues(field.getType())
             ));
+        } else {//add null
+            return new ComboBox<>(FXCollections.observableArrayList(
+                    Controller.controller.instances
+                            .stream()
+                            .filter(item -> item.getClass().equals(field.getType()))
+                            .map(Object::hashCode)
+                            .toArray(Integer[]::new)));
         }
-        return new TextField();
     }
 
     @FXML
@@ -81,7 +87,7 @@ public class AddController {
                     return true;
                 }
             } else if (inputField instanceof ComboBox) {
-                if (((String) ((ComboBox) inputField).getValue()).isEmpty()) {
+                if (((ComboBox) inputField).getSelectionModel().isSelected(-1)) {
                     return true;
                 }
             }
