@@ -3,7 +3,7 @@ package sample;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import org.reflections.Reflections;
-import sample.attribute.Size;
+import sample.annotation.Entity;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;

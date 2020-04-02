@@ -1,14 +1,8 @@
 package sample.motorcyclist;
 
-import sample.Entity;
-import sample.Title;
+import sample.annotation.Entity;
+import sample.annotation.Title;
 import sample.ammunition.*;
-import sample.attribute.Size;
-
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
 
 @Entity
 public class Motorcyclist {

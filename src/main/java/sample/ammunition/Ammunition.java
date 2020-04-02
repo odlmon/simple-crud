@@ -1,6 +1,6 @@
 package sample.ammunition;
 
-import sample.Title;
+import sample.annotation.Title;
 import sample.attribute.Size;
 
 public abstract class Ammunition {

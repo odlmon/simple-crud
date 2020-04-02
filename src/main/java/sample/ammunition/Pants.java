@@ -1,7 +1,7 @@
 package sample.ammunition;
 
-import sample.Entity;
-import sample.Title;
+import sample.annotation.Entity;
+import sample.annotation.Title;
 import sample.attribute.Color;
 import sample.attribute.Size;
 import sample.attribute.TypeOfPockets;

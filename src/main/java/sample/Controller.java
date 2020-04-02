@@ -35,7 +35,7 @@ public class Controller {
     private MenuItem miAddNewInstance;
 
     public static Controller controller;
-
+    //TODO: сделать возможность изменения сущностей при выборе из таблицы
     @FXML
     public TableView<Object> table;
 
