@@ -102,8 +102,12 @@ public class Controller {
     }
 
     public void updateTable(Object instance) {
-        instances.add(instance);
-        table.getItems().add(instance);
+        if (instance != null) {
+            instances.add(instance);
+            table.getItems().add(instance);
+        } else {
+            table.refresh();
+        }
     }
 
 }

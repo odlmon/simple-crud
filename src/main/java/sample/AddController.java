@@ -197,6 +197,17 @@ public class AddController {
         }
         return params;
     }
+
+    private void updateFields(Object object, Object[] params, Field[] fields) {
+        try {
+            for (int i = 0; i < fields.length; i++) {
+                fields[i].setAccessible(true);
+                fields[i].set(object, params[i]);
+            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
     //TODO: сделать разделения добавление и обновления данных, возможно через передачу флага
     @FXML
     void onConfirmPressAction(ActionEvent event) {
@@ -208,10 +219,15 @@ public class AddController {
                 Class[] classes = ClassParser.getAllTypesOfFields(selectedClass);
                 Object[] params = getParamsFromFields(selectedClass, classes, inputFields);
                 if (params != null) {
-                    Object instance = ClassParser.getFullConstructor(selectedClass).newInstance(params);
-                    Controller.controller.updateTable(instance);
+                    if (Controller.isUpdating) {
+                        updateFields(Controller.updatingValue, params, ClassParser.getAllFields(selectedClass));
+                        Controller.controller.updateTable(null);
+                    } else {
+                        Object instance = ClassParser.getFullConstructor(selectedClass).newInstance(params);
+                        Controller.controller.updateTable(instance);
+                        clearFields();
+                    }
                 }
-                clearFields();
             } catch (ClassNotFoundException | InstantiationException | IllegalAccessException |
                     InvocationTargetException e) {
                 e.printStackTrace();
