@@ -26,11 +26,71 @@ public class AddController {
 
     @FXML
     private Button bConfirm;
-    /*TODO: для полей-объектов (не считая String) сделать возможность ставить null либо объект, но
-       в случае List придумать что-то вроде ComboBox с множественным выбором сущностей-наследников Ammunition*/
+
     private List<Label> labelList = new ArrayList<>();
 
     private List<Object> inputFields = new ArrayList<>();
+
+    private void handleComboBoxSelection() {
+        try {
+            bConfirm.setDisable(false);
+            Class selectedClass = Class.forName(cbClasses.getValue());
+            System.out.println(ClassParser.getFullConstructor(selectedClass));
+            Field[] fields = ClassParser.getAllFields(selectedClass);
+            labelList.clear();
+            inputFields.clear();
+            grid.getChildren().clear();
+            for (int i = 0; i < fields.length; i++) {
+                labelList.add(new Label(fields[i].getAnnotation(Title.class).value()));
+                inputFields.add(resolveFieldType(fields[i]));
+                grid.add(labelList.get(i), 0, i);
+                grid.add((Node) inputFields.get(i), 1, i);
+            }
+        } catch (ClassNotFoundException e) {
+            System.err.println("Nonexistent class selected " + e);
+        }
+    }
+
+    private void setFieldValue(Object object, Object inputField, Field field, Class fieldType) {
+        try {
+            field.setAccessible(true);
+            Object fieldValue = field.get(object);
+            if (inputField instanceof TextField) {
+                if (fieldType.equals(int.class)) {
+                    ((TextField) inputField).setText(Integer.toString((int) fieldValue));
+                } else if (fieldType.equals(String.class)) {
+                    ((TextField) inputField).setText((String) fieldValue);
+                }
+            } else if (inputField instanceof ComboBox) {
+                if (fieldType.isEnum()) {
+                    ((ComboBox) inputField).setValue(fieldValue.toString());
+                } else if (!fieldType.isPrimitive()) {
+                    if (fieldValue == null) {
+                        ((ComboBox) inputField).setValue("null");
+                    } else {
+                        ((ComboBox) inputField).setValue(Integer.toString(fieldValue.hashCode()));
+                    }
+                }
+            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setFieldsValues(Object object) {
+        Field[] fields = ClassParser.getAllFields(object.getClass());
+        Class[] classes = ClassParser.getAllTypesOfFields(object.getClass());
+        for (int i = 0; i < fields.length; i++) {
+            setFieldValue(object, inputFields.get(i), fields[i], classes[i]);
+        }
+    }
+
+    private void setUpdatingMode() {
+        cbClasses.setDisable(true);
+        cbClasses.setValue(Controller.updatingValue.getClass().getName());
+        handleComboBoxSelection();
+        setFieldsValues(Controller.updatingValue);
+    }
 
     @FXML
     public void initialize() {
@@ -38,6 +98,9 @@ public class AddController {
                 ClassParser.getAllClassesInPackage("sample"));
         cbClasses.setItems(data);
         bConfirm.setDisable(true);
+        if (Controller.isUpdating) {
+            setUpdatingMode();
+        }
     }
 
     private void showAlert(Alert.AlertType type, String header, String content) {
@@ -66,20 +129,8 @@ public class AddController {
     }
 
     @FXML
-    void onClassChoose(ActionEvent event) throws ClassNotFoundException {
-        bConfirm.setDisable(false);
-        Class selectedClass = Class.forName(cbClasses.getValue());
-        System.out.println(ClassParser.getFullConstructor(selectedClass));
-        Field[] fields = ClassParser.getAllFields(selectedClass);
-        labelList.clear();
-        inputFields.clear();
-        grid.getChildren().clear();
-        for (int i = 0; i < fields.length; i++) {
-            labelList.add(new Label(fields[i].getAnnotation(Title.class).value()));
-            inputFields.add(resolveFieldType(fields[i]));
-            grid.add(labelList.get(i), 0, i);
-            grid.add((Node) inputFields.get(i), 1, i);
-        }
+    void onClassChoose(ActionEvent event) {
+        handleComboBoxSelection();
     }
 
     private boolean inputFieldsIsEmpty() {
@@ -107,7 +158,7 @@ public class AddController {
         }
     }
 
-    private Object parseField(Class c, Object inputField, Class fieldType) throws NumberFormatException{
+    private Object parseField(Object inputField, Class fieldType) throws NumberFormatException{
         if (inputField instanceof TextField) {
             if (fieldType.equals(int.class)) {
                 return Integer.parseInt(((TextField) inputField).getText());
@@ -136,7 +187,7 @@ public class AddController {
         Object[] params = new Object[ClassParser.getFieldsCount(c)];
         for (int i = 0; i < inputFields.size(); i++) {
             try {
-                params[i] = parseField(c, inputFields.get(i), classes[i]);
+                params[i] = parseField(inputFields.get(i), classes[i]);
             } catch (NumberFormatException e) {
                 ((TextField) inputFields.get(i)).setText("");
                 showAlert(Alert.AlertType.ERROR, "Type Mismatch Error",

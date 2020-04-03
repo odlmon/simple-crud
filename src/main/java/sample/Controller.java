@@ -29,6 +29,10 @@ public class Controller {
     @FXML
     private MenuItem miAddNewInstance;
 
+    public static boolean isUpdating;
+
+    public static Object updatingValue;
+
     public static Controller controller;
     //TODO: сделать возможность изменения сущностей при выборе из таблицы
     @FXML
@@ -51,6 +55,22 @@ public class Controller {
                 createColumn("Hash", Object::hashCode, 0.1, false),
                 createColumn("Class", Object::getClass, 0.2, false),
                 createColumn("Value", Object::toString, 0.697, false));
+        table.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
+            System.out.println("Test" + newValue);
+            updatingValue = newValue;
+            try {
+                isUpdating = true;
+                Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("add.fxml"));
+                Stage stage = new Stage();
+                stage.initModality(Modality.APPLICATION_MODAL);
+                stage.setTitle("Update instance");
+                stage.setScene(new Scene(root, 381, 400));
+                stage.show();
+            } catch (IOException e) {
+                isUpdating = false;
+                System.err.println("Error to create new stage " + e);
+            }
+        }));
     }
 
     @FXML
@@ -69,6 +89,7 @@ public class Controller {
     @FXML
     void addNewInstanceAction(ActionEvent event) {
         try {
+            isUpdating = false;
             Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("add.fxml"));
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
