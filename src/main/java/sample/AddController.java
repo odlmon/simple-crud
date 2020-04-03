@@ -12,7 +12,9 @@ import sample.annotation.Title;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class AddController {
 
@@ -52,13 +54,14 @@ public class AddController {
             return new ComboBox<>(FXCollections.observableArrayList(
                     ClassParser.getAllEnumValues(field.getType())
             ));
-        } else {//add null
+        } else {
             return new ComboBox<>(FXCollections.observableArrayList(
-                    Controller.controller.instances
+                    Stream.concat(Stream.of("null"), Controller.controller.instances
                             .stream()
                             .filter(item -> item.getClass().equals(field.getType()))
                             .map(Object::hashCode)
-                            .toArray(Integer[]::new)));
+                            .map(Object::toString))
+                    .toArray(String[]::new)));
         }
     }
 
@@ -112,15 +115,18 @@ public class AddController {
                 return ((TextField) inputField).getText();
             }
         } else if (inputField instanceof ComboBox) {
-            Object object = ((ComboBox) inputField).getValue();
-            if (object.getClass().equals(String.class)) {
-                return Enum.valueOf(fieldType, (String) object);
-            }
-            if (object.getClass().equals(Integer.class)) {
-                return Controller.controller.instances
-                        .stream()
-                        .filter(item -> item.hashCode() == (Integer) object)
-                        .findFirst().get();
+            String value = (String) ((ComboBox) inputField).getValue();
+            if (fieldType.isEnum()) {
+                return Enum.valueOf(fieldType, value);
+            } else if (!fieldType.isPrimitive()) {
+                if (value.equals("null")) {
+                    return null;
+                } else {
+                    return Controller.controller.instances
+                            .stream()
+                            .filter(item -> item.hashCode() == Integer.parseInt(value))
+                            .findFirst().get();
+                }
             }
         }
         return null;
