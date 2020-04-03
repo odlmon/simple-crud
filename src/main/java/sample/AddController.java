@@ -12,7 +12,6 @@ import sample.annotation.Title;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -35,7 +34,6 @@ public class AddController {
         try {
             bConfirm.setDisable(false);
             Class selectedClass = Class.forName(cbClasses.getValue());
-            System.out.println(ClassParser.getFullConstructor(selectedClass));
             Field[] fields = ClassParser.getAllFields(selectedClass);
             labelList.clear();
             inputFields.clear();
@@ -208,7 +206,7 @@ public class AddController {
             e.printStackTrace();
         }
     }
-    //TODO: сделать разделения добавление и обновления данных, возможно через передачу флага
+
     @FXML
     void onConfirmPressAction(ActionEvent event) {
         if (inputFieldsIsEmpty()) {

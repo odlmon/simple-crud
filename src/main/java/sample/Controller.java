@@ -11,18 +11,12 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import sample.attribute.HelmetType;
-import sample.attribute.Size;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-
-import static sample.ClassParser.getAllClassesInPackage;
-import static sample.ClassParser.getFullConstructor;
 
 public class Controller {
 
@@ -34,7 +28,7 @@ public class Controller {
     public static Object updatingValue;
 
     public static Controller controller;
-    //TODO: сделать возможность изменения сущностей при выборе из таблицы
+
     @FXML
     public TableView<Object> table;
 
@@ -49,6 +43,20 @@ public class Controller {
         return column;
     }
 
+    private void createNewModalStage(String title) {
+        try {
+            Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("add.fxml"));
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle(title);
+            stage.setScene(new Scene(root, 381, 400));
+            stage.show();
+        } catch (IOException e) {
+            isUpdating = false;
+            System.err.println("Error to create new stage " + e);
+        }
+    }
+
     private void initializeTable() {
         table.getColumns().clear();
         table.getColumns().addAll(
@@ -56,49 +64,21 @@ public class Controller {
                 createColumn("Class", Object::getClass, 0.2, false),
                 createColumn("Value", Object::toString, 0.697, false));
         table.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
-            System.out.println("Test" + newValue);
             updatingValue = newValue;
-            try {
-                isUpdating = true;
-                Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("add.fxml"));
-                Stage stage = new Stage();
-                stage.initModality(Modality.APPLICATION_MODAL);
-                stage.setTitle("Update instance");
-                stage.setScene(new Scene(root, 381, 400));
-                stage.show();
-            } catch (IOException e) {
-                isUpdating = false;
-                System.err.println("Error to create new stage " + e);
-            }
+            isUpdating = true;
+            createNewModalStage("Update instance");
         }));
     }
 
     @FXML
-    public void initialize() throws ClassNotFoundException,
-            IllegalAccessException, InstantiationException, InvocationTargetException {
-        String[] classes = getAllClassesInPackage("sample");
-        for (String classItem: classes) {
-            System.out.println(classItem);
-        }
-        Constructor fullConstructor = getFullConstructor(Class.forName(classes[1]));
-        System.out.println(fullConstructor.newInstance(101, Size.S, "model1", 2020, HelmetType.Open, 3));
+    public void initialize() {
         initializeTable();
-//        table.getItems().add(fullConstructor.newInstance(101, Size.S, "model1", 2020, HelmetType.Open, 3));
     }
 
     @FXML
     void addNewInstanceAction(ActionEvent event) {
-        try {
-            isUpdating = false;
-            Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("add.fxml"));
-            Stage stage = new Stage();
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setTitle("Add new instance");
-            stage.setScene(new Scene(root, 381, 400));
-            stage.show();
-        } catch (IOException e) {
-            System.err.println("Error to create new stage " + e);
-        }
+        isUpdating = false;
+        createNewModalStage("Add new instance");
     }
 
     public void updateTable(Object instance) {
