@@ -56,8 +56,8 @@ public class AddController {
         try {
             field.setAccessible(true);
             Object fieldValue = field.get(object);
-            if (int.class.equals(fieldType)) {
-                inputField.setValue(Integer.toString((int) fieldValue));
+            if (fieldType.isPrimitive()) {
+                inputField.setValue(String.valueOf(fieldValue));
             } else if (String.class.equals(fieldType)) {
                 inputField.setValue((String) fieldValue);
             } else if (fieldType.isEnum()) {
@@ -140,8 +140,24 @@ public class AddController {
 
     private Object parseField(ControlAdapter<String> inputField, Class fieldType) throws NumberFormatException{
         String value = inputField.getValue();
-        if (int.class.equals(fieldType)) {
-            return Integer.parseInt(value);
+        if (fieldType.isPrimitive()) {
+            if (byte.class.equals(fieldType)) {
+                return Byte.parseByte(value);
+            } else if (short.class.equals(fieldType)) {
+                return Short.parseShort(value);
+            } else if (int.class.equals(fieldType)) {
+                return Integer.parseInt(value);
+            } else if (long.class.equals(fieldType)) {
+                return Long.parseLong(value);
+            } else if (float.class.equals(fieldType)) {
+                return Float.parseFloat(value);
+            } else if (double.class.equals(fieldType)) {
+                return Double.parseDouble(value);
+            } else if (char.class.equals(fieldType)) {
+                return value.charAt(0);
+            } else if (boolean.class.equals(fieldType)) {
+                return Boolean.parseBoolean(value);
+            }
         } else if (String.class.equals(fieldType)) {
             return value;
         } else if (fieldType.isEnum()) {
