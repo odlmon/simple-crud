@@ -6,7 +6,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.stage.Modality;
@@ -18,9 +17,6 @@ import java.util.List;
 import java.util.function.Function;
 
 public class Controller {
-
-    @FXML
-    private MenuItem miAddNewInstance;
 
     public static boolean isUpdating;
 
