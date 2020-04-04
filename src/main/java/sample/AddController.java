@@ -7,7 +7,10 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import sample.adapter.ComboBoxAdapter;
+import sample.adapter.TextFieldAdapter;
 import sample.annotation.Title;
+import sample.adapter.ControlAdapter;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -28,7 +31,7 @@ public class AddController {
 
     private List<Label> labelList = new ArrayList<>();
 
-    private List<Object> inputFields = new ArrayList<>();
+    private List<ControlAdapter<String>> inputFields = new ArrayList<>();
 
     private void handleComboBoxSelection() {
         try {
@@ -42,32 +45,28 @@ public class AddController {
                 labelList.add(new Label(fields[i].getAnnotation(Title.class).value()));
                 inputFields.add(resolveFieldType(fields[i]));
                 grid.add(labelList.get(i), 0, i);
-                grid.add((Node) inputFields.get(i), 1, i);
+                grid.add((Node) inputFields.get(i).getObject(), 1, i);
             }
         } catch (ClassNotFoundException e) {
             System.err.println("Nonexistent class selected " + e);
         }
     }
 
-    private void setFieldValue(Object object, Object inputField, Field field, Class fieldType) {
+    private void setFieldValue(Object object, ControlAdapter<String> inputField, Field field, Class fieldType) {
         try {
             field.setAccessible(true);
             Object fieldValue = field.get(object);
-            if (inputField instanceof TextField) {
-                if (fieldType.equals(int.class)) {
-                    ((TextField) inputField).setText(Integer.toString((int) fieldValue));
-                } else if (fieldType.equals(String.class)) {
-                    ((TextField) inputField).setText((String) fieldValue);
-                }
-            } else if (inputField instanceof ComboBox) {
-                if (fieldType.isEnum()) {
-                    ((ComboBox) inputField).setValue(fieldValue.toString());
-                } else if (!fieldType.isPrimitive()) {
-                    if (fieldValue == null) {
-                        ((ComboBox) inputField).setValue("null");
-                    } else {
-                        ((ComboBox) inputField).setValue(Integer.toString(fieldValue.hashCode()));
-                    }
+            if (fieldType.isPrimitive()) {
+                inputField.setValue(String.valueOf(fieldValue));
+            } else if (String.class.equals(fieldType)) {
+                inputField.setValue((String) fieldValue);
+            } else if (fieldType.isEnum()) {
+                inputField.setValue(fieldValue.toString());
+            } else if (!fieldType.isPrimitive()) {
+                if ((fieldValue == null)) {
+                    inputField.setValue("null");
+                } else {
+                    inputField.setValue(Integer.toString(fieldValue.hashCode()));
                 }
             }
         } catch (IllegalAccessException e) {
@@ -108,21 +107,21 @@ public class AddController {
         alert.show();
     }
 
-    private Object resolveFieldType(Field field) {
+    private ControlAdapter<String> resolveFieldType(Field field) {
         if (field.getType().isPrimitive() || field.getType().equals(String.class)) {
-            return new TextField();
+            return new TextFieldAdapter(new TextField());
         } else if (field.getType().isEnum()) {
-            return new ComboBox<>(FXCollections.observableArrayList(
+            return new ComboBoxAdapter<>(new ComboBox<>(FXCollections.observableArrayList(
                     ClassParser.getAllEnumValues(field.getType())
-            ));
+            )));
         } else {
-            return new ComboBox<>(FXCollections.observableArrayList(
+            return new ComboBoxAdapter<>(new ComboBox<>(FXCollections.observableArrayList(
                     Stream.concat(Stream.of("null"), Controller.controller.instances
                             .stream()
                             .filter(item -> item.getClass().equals(field.getType()))
                             .map(Object::hashCode)
                             .map(Object::toString))
-                    .toArray(String[]::new)));
+                    .toArray(String[]::new))));
         }
     }
 
@@ -132,62 +131,54 @@ public class AddController {
     }
 
     private boolean inputFieldsIsEmpty() {
-        for (Object inputField : inputFields) {
-            if (inputField instanceof TextField) {
-                if (((TextField) inputField).getText().isEmpty()) {
-                    return true;
-                }
-            } else if (inputField instanceof ComboBox) {
-                if (((ComboBox) inputField).getSelectionModel().isSelected(-1)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return inputFields.stream().anyMatch(ControlAdapter::isEmpty);
     }
 
     private void clearFields() {
-        for (Object inputField : inputFields) {
-            if (inputField instanceof TextField) {
-                ((TextField) inputField).setText("");
-            } else if (inputField instanceof ComboBox) {
-                ((ComboBox) inputField).getSelectionModel().select(-1);
-            }
-        }
+        inputFields.forEach(ControlAdapter::clear);
     }
 
-    private Object parseField(Object inputField, Class fieldType) throws NumberFormatException{
-        if (inputField instanceof TextField) {
-            if (fieldType.equals(int.class)) {
-                return Integer.parseInt(((TextField) inputField).getText());
-            } else if (fieldType.equals(String.class)) {
-                return ((TextField) inputField).getText();
+    private Object parseField(ControlAdapter<String> inputField, Class fieldType) throws NumberFormatException{
+        String value = inputField.getValue();
+        if (fieldType.isPrimitive()) {
+            if (byte.class.equals(fieldType)) {
+                return Byte.parseByte(value);
+            } else if (short.class.equals(fieldType)) {
+                return Short.parseShort(value);
+            } else if (int.class.equals(fieldType)) {
+                return Integer.parseInt(value);
+            } else if (long.class.equals(fieldType)) {
+                return Long.parseLong(value);
+            } else if (float.class.equals(fieldType)) {
+                return Float.parseFloat(value);
+            } else if (double.class.equals(fieldType)) {
+                return Double.parseDouble(value);
+            } else if (char.class.equals(fieldType)) {
+                return value.charAt(0);
+            } else if (boolean.class.equals(fieldType)) {
+                return Boolean.parseBoolean(value);
             }
-        } else if (inputField instanceof ComboBox) {
-            String value = (String) ((ComboBox) inputField).getValue();
-            if (fieldType.isEnum()) {
-                return Enum.valueOf(fieldType, value);
-            } else if (!fieldType.isPrimitive()) {
-                if (value.equals("null")) {
-                    return null;
-                } else {
-                    return Controller.controller.instances
-                            .stream()
-                            .filter(item -> item.hashCode() == Integer.parseInt(value))
-                            .findFirst().get();
-                }
-            }
+        } else if (String.class.equals(fieldType)) {
+            return value;
+        } else if (fieldType.isEnum()) {
+            return Enum.valueOf(fieldType, value);
+        } else if (!fieldType.isPrimitive()) {
+            return (value.equals("null")) ? null :
+                    Controller.controller.instances
+                        .stream()
+                        .filter(item -> item.hashCode() == Integer.parseInt(value))
+                        .findFirst().get();
         }
         return null;
     }
 
-    private Object[] getParamsFromFields(Class c, Class[] classes, List<Object> inputFields) {
+    private Object[] getParamsFromFields(Class c, Class[] classes, List<ControlAdapter<String>> inputFields) {
         Object[] params = new Object[ClassParser.getFieldsCount(c)];
         for (int i = 0; i < inputFields.size(); i++) {
             try {
                 params[i] = parseField(inputFields.get(i), classes[i]);
             } catch (NumberFormatException e) {
-                ((TextField) inputFields.get(i)).setText("");
+                inputFields.get(i).setValue("");
                 showAlert(Alert.AlertType.ERROR, "Type Mismatch Error",
                         "Some fields have invalid values");
                 return null;
