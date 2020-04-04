@@ -2,8 +2,9 @@ package sample;
 
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+import sample.adapter.ControlAdapter;
 
-public class InputField {
+public class InputField implements ControlAdapter {
 
     private Object inputField;
 
