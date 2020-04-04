@@ -7,7 +7,10 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import sample.adapter.ComboBoxAdapter;
+import sample.adapter.TextFieldAdapter;
 import sample.annotation.Title;
+import sample.adapter.ControlAdapter;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -28,7 +31,7 @@ public class AddController {
 
     private List<Label> labelList = new ArrayList<>();
 
-    private List<InputField> inputFields = new ArrayList<>();
+    private List<ControlAdapter<String>> inputFields = new ArrayList<>();
 
     private void handleComboBoxSelection() {
         try {
@@ -49,7 +52,7 @@ public class AddController {
         }
     }
 
-    private void setFieldValue(Object object, InputField inputField, Field field, Class fieldType) {
+    private void setFieldValue(Object object, ControlAdapter<String> inputField, Field field, Class fieldType) {
         try {
             field.setAccessible(true);
             Object fieldValue = field.get(object);
@@ -104,15 +107,15 @@ public class AddController {
         alert.show();
     }
 
-    private InputField resolveFieldType(Field field) {
+    private ControlAdapter<String> resolveFieldType(Field field) {
         if (field.getType().isPrimitive() || field.getType().equals(String.class)) {
-            return new InputField(new TextField());
+            return new TextFieldAdapter(new TextField());
         } else if (field.getType().isEnum()) {
-            return new InputField(new ComboBox<>(FXCollections.observableArrayList(
+            return new ComboBoxAdapter<>(new ComboBox<>(FXCollections.observableArrayList(
                     ClassParser.getAllEnumValues(field.getType())
             )));
         } else {
-            return new InputField(new ComboBox<>(FXCollections.observableArrayList(
+            return new ComboBoxAdapter<>(new ComboBox<>(FXCollections.observableArrayList(
                     Stream.concat(Stream.of("null"), Controller.controller.instances
                             .stream()
                             .filter(item -> item.getClass().equals(field.getType()))
@@ -128,14 +131,14 @@ public class AddController {
     }
 
     private boolean inputFieldsIsEmpty() {
-        return inputFields.stream().anyMatch(InputField::isEmpty);
+        return inputFields.stream().anyMatch(ControlAdapter::isEmpty);
     }
 
     private void clearFields() {
-        inputFields.forEach(InputField::clear);
+        inputFields.forEach(ControlAdapter::clear);
     }
 
-    private Object parseField(InputField inputField, Class fieldType) throws NumberFormatException{
+    private Object parseField(ControlAdapter<String> inputField, Class fieldType) throws NumberFormatException{
         String value = inputField.getValue();
         if (int.class.equals(fieldType)) {
             return Integer.parseInt(value);
@@ -153,7 +156,7 @@ public class AddController {
         return null;
     }
 
-    private Object[] getParamsFromFields(Class c, Class[] classes, List<InputField> inputFields) {
+    private Object[] getParamsFromFields(Class c, Class[] classes, List<ControlAdapter<String>> inputFields) {
         Object[] params = new Object[ClassParser.getFieldsCount(c)];
         for (int i = 0; i < inputFields.size(); i++) {
             try {

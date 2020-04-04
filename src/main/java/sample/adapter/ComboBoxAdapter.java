@@ -17,21 +17,21 @@ public class ComboBoxAdapter<T> implements ControlAdapter<T> {
 
     @Override
     public void setValue(T value) {
-
+        comboBox.setValue(value);
     }
 
     @Override
     public boolean isEmpty() {
-        return false;
+        return comboBox.getSelectionModel().isSelected(-1);
     }
 
     @Override
     public void clear() {
-
+        comboBox.getSelectionModel().select(-1);
     }
 
     @Override
     public ComboBox<T> getObject() {
-        return null;
+        return comboBox;
     }
 }
