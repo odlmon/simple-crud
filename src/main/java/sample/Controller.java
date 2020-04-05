@@ -8,9 +8,14 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import sample.serialize.BinarySerializer;
+import sample.serialize.JsonSerializer;
+import sample.serialize.Serializer;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -74,6 +79,39 @@ public class Controller {
     void addNewInstanceAction(ActionEvent event) {
         isUpdating = false;
         createNewModalStage("Add new instance");
+    }
+
+    private Serializer getSerializerByExtension(String extension) {
+        if (extension.equals("bin")) {
+            return new BinarySerializer();
+        } else if (extension.equals("json")) {
+            return new JsonSerializer();
+        } else {
+            return null;
+        }
+    }
+
+    private void serializeInstances(Serializer serializer, File file) {
+        instances.forEach(instance -> serializer.serialize(instance, file));
+    }
+
+    @FXML
+    void onSaveAsAction(ActionEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Binary files (*.bin)", "*.bin"),
+                new FileChooser.ExtensionFilter("JSON files (*.json)", "*.json"),
+                new FileChooser.ExtensionFilter("STR files (*.str)", "*.str")
+        );
+        File file = fileChooser.showSaveDialog(new Stage());
+        if (file != null) {
+            Serializer serializer = getSerializerByExtension(fileChooser
+                    .getSelectedExtensionFilter()
+                    .getExtensions()
+                    .get(0)
+                    .substring(2));
+            serializeInstances(serializer, file);
+        }
     }
 
     public void updateTable(Object instance) {
