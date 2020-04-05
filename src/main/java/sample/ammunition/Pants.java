@@ -10,7 +10,7 @@ import sample.attribute.TypeOfPockets;
 public class Pants extends Ammunition {
 
     @Title("Color")
-    private Color color = Color.Black;
+    private Color color;
 
     @Title("Pocket type")
     private TypeOfPockets pocketType;

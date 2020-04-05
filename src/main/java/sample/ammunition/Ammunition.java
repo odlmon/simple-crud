@@ -3,16 +3,18 @@ package sample.ammunition;
 import sample.annotation.Title;
 import sample.attribute.Size;
 
-public abstract class Ammunition {
+import java.io.Serializable;
+
+public abstract class Ammunition implements Serializable {
 
     @Title("Cost")
-    private int cost = 100;
+    private int cost;
     @Title("Size")
-    private Size size = Size.XL;
+    private Size size;
     @Title("Model")
-    private String model = "undetermined";
+    private String model;
     @Title("Production date")
-    private int dateOfIssue = 2018;
+    private int dateOfIssue;
 
     public int getCost() {
         return cost;

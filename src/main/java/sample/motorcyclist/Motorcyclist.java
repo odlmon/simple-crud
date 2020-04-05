@@ -4,8 +4,10 @@ import sample.annotation.Entity;
 import sample.annotation.Title;
 import sample.ammunition.*;
 
+import java.io.Serializable;
+
 @Entity
-public class Motorcyclist {
+public class Motorcyclist implements Serializable {
 
     @Title("Helmet")
     private Helmet helmet;

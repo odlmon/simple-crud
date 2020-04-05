@@ -9,7 +9,7 @@ import sample.attribute.Size;
 public class Jacket extends Ammunition {
 
     @Title("Material")
-    private Material material = Material.Leather;
+    private Material material;
 
     public Material getMaterial() {
         return material;
