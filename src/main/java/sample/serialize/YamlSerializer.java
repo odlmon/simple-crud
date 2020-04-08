@@ -42,9 +42,10 @@ public class YamlSerializer implements Serializer {
     }
 
     @Override
-    public void serialize(Object object, File file) {
+    public void serialize(Object[] objects, File file) {
         try (FileWriter writer = new FileWriter(file)) {
-            writer.write(toYaml(object));
+            writer.write(Arrays.stream(objects)
+                    .map(this::toYaml).collect(Collectors.joining("\n---\n")));
             writer.flush();
         } catch (IOException e) {
             e.printStackTrace();
@@ -111,10 +112,15 @@ public class YamlSerializer implements Serializer {
     }
 
     @Override
-    public Object deserialize(File file) {
+    public Object[] deserialize(File file) {
         try (FileReader reader = new FileReader(file)) {
-            String yamlText = new BufferedReader(reader).lines().collect(Collectors.joining("\n"));
-            return fromYaml(new ArrayDeque<>(Arrays.asList(yamlText.split("\n"))));
+            String[] strings = new BufferedReader(reader)
+                    .lines()
+                    .collect(Collectors.joining("\n"))
+                    .split("\n---\n");
+            return Arrays.stream(strings)
+                    .map(string -> fromYaml(new ArrayDeque<>(Arrays.asList(string.split("\n")))))
+                    .toArray(Object[]::new);
         } catch (IOException e) {
             e.printStackTrace();
             return null;

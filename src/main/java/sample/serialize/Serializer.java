@@ -4,7 +4,7 @@ import java.io.File;
 
 public interface Serializer {
 
-    void serialize(Object object, File file);
+    void serialize(Object[] objects, File file);
 
-    Object deserialize(File file);
+    Object[] deserialize(File file);
 }
