@@ -6,14 +6,14 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import sample.serialize.BinarySerializer;
 import sample.serialize.JsonSerializer;
 import sample.serialize.Serializer;
+import sample.serialize.YamlSerializer;
 
 import java.io.File;
 import java.io.IOException;
@@ -86,6 +86,8 @@ public class Controller {
             return new BinarySerializer();
         } else if (extension.equals("json")) {
             return new JsonSerializer();
+        } else if (extension.equals("yaml")) {
+            return new YamlSerializer();
         } else {
             return null;
         }
@@ -101,7 +103,7 @@ public class Controller {
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Binary files (*.bin)", "*.bin"),
                 new FileChooser.ExtensionFilter("JSON files (*.json)", "*.json"),
-                new FileChooser.ExtensionFilter("STR files (*.str)", "*.str")
+                new FileChooser.ExtensionFilter("YAML files (*.yaml)", "*.yaml")
         );
         File file = fileChooser.showSaveDialog(new Stage());
         if (file != null) {
