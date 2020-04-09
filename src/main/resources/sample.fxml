@@ -15,8 +15,8 @@
         <Menu mnemonicParsing="false" text="File">
           <items>
             <MenuItem mnemonicParsing="false" onAction="#addNewInstanceAction" text="Add new instance" />
-            <MenuItem mnemonicParsing="false" text="Open…" />
-            <MenuItem mnemonicParsing="false" text="Save As…" />
+            <MenuItem mnemonicParsing="false" onAction="#onOpenAction" text="Open…" />
+                  <MenuItem mnemonicParsing="false" onAction="#onSaveAsAction" text="Save As..." />
             <SeparatorMenuItem mnemonicParsing="false" />
             <MenuItem mnemonicParsing="false" text="Quit" />
           </items>

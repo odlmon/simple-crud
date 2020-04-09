@@ -138,7 +138,7 @@ public class AddController {
         inputFields.forEach(ControlAdapter::clear);
     }
 
-    private Object parseField(ControlAdapter<String> inputField, Class fieldType) throws NumberFormatException{
+    private Object parseField(ControlAdapter<String> inputField, Class fieldType) throws NumberFormatException {
         String value = inputField.getValue();
         if (fieldType.isPrimitive()) {
             if (byte.class.equals(fieldType)) {
