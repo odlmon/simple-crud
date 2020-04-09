@@ -105,7 +105,7 @@ public class YamlSerializer implements Serializer {
             }
             return ClassParser.getFullConstructor(c).newInstance(params);
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException |
-                InvocationTargetException e) {
+                InvocationTargetException | IllegalArgumentException e) {
             e.printStackTrace();
             return null;
         }

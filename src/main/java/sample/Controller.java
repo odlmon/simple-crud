@@ -171,8 +171,15 @@ public class Controller {
         Pair<Serializer, File> pair = getSerializerFromChooser(false);
         if (pair != null) {
             instances = deserializeInstances(pair.getKey(), pair.getValue());
-            table.getItems().clear();
-            instances.forEach(i -> table.getItems().add(i));
+            if (instances.isEmpty() || instances.contains(null)) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setHeaderText("Error while deserialization");
+                alert.setContentText("File empty or invalid");
+                alert.show();
+            } else {
+                table.getItems().clear();
+                instances.forEach(i -> table.getItems().add(i));
+            }
         }
     }
 
