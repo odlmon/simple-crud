@@ -142,7 +142,8 @@ public class Controller {
     }
 
     private ArrayList<Object> deserializeInstances(Serializer serializer, File file) {
-        return new ArrayList<>(Arrays.asList(serializer.deserialize(file)));
+        Object[] objects = serializer.deserialize(file);
+        return (objects != null) ? new ArrayList<>(Arrays.asList(objects)) : new ArrayList<>();
     }
 
     private Pair<Serializer, File> getSerializerFromChooser(boolean isSaveMode) {
