@@ -4,6 +4,7 @@ import sample.annotation.Title;
 import sample.attribute.Size;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public abstract class Ammunition implements Serializable {
 
@@ -47,6 +48,22 @@ public abstract class Ammunition implements Serializable {
         this.size = size;
         this.model = model;
         this.dateOfIssue = dateOfIssue;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Ammunition)) return false;
+        Ammunition that = (Ammunition) o;
+        return cost == that.cost &&
+                dateOfIssue == that.dateOfIssue &&
+                size == that.size &&
+                Objects.equals(model, that.model);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(cost, size, model, dateOfIssue);
     }
 
     @Override

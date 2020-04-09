@@ -5,6 +5,8 @@ import sample.annotation.Title;
 import sample.attribute.HelmetType;
 import sample.attribute.Size;
 
+import java.util.Objects;
+
 @Entity
 public class Helmet extends Ammunition {
 
@@ -34,6 +36,21 @@ public class Helmet extends Ammunition {
         super(cost, size, model, dateOfIssue);
         this.type = type;
         this.numberOfShells = numberOfShells;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Helmet)) return false;
+        if (!super.equals(o)) return false;
+        Helmet helmet = (Helmet) o;
+        return numberOfShells == helmet.numberOfShells &&
+                type == helmet.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), type, numberOfShells);
     }
 
     @Override
