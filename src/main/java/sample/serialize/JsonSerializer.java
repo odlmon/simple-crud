@@ -13,7 +13,7 @@ public class JsonSerializer implements Serializer {
 
     @Override
     public void serialize(Object[] objects, File file) {
-        try (FileWriter writer = new FileWriter(file)) {
+        try (var writer = new FileWriter(file)) {
             writer.write(Arrays.stream(objects)
                     .map(object -> gson.toJson(new JsonWrapper(object.getClass().getName(), gson.toJson(object))))
                     .collect(Collectors.joining("\n---\n")));
@@ -25,12 +25,12 @@ public class JsonSerializer implements Serializer {
 
     @Override
     public Object[] deserialize(File file) {
-        try (FileReader reader = new FileReader(file)) {
+        try (var reader = new FileReader(file)) {
             String[] strings = new BufferedReader(reader)
                     .lines()
                     .collect(Collectors.joining(""))
                     .split("---");
-            Object[] objects = new Object[strings.length];
+            var objects = new Object[strings.length];
             for (int i = 0; i < strings.length; i++) {
                 JsonWrapper jsonWrapper = gson.fromJson(strings[i], JsonWrapper.class);
                 objects[i] = gson.fromJson(jsonWrapper.getValue(), Class.forName(jsonWrapper.getClassName()));

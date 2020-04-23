@@ -18,14 +18,15 @@ import sample.serialize.JsonSerializer;
 import sample.serialize.Serializer;
 import sample.serialize.YamlSerializer;
 
-import static sample.ClassParser.*;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
+
+import static sample.ClassParser.getAllFields;
+import static sample.ClassParser.getAllTypesOfFields;
 
 public class Controller {
 
@@ -91,14 +92,14 @@ public class Controller {
                 createColumn("Hash", Object::hashCode, 0.1, false),
                 createColumn("Class", this::getClassName, 0.15, false),
                 createColumn("Value", Object::toString, 0.747, false));
-        ContextMenu cm = new ContextMenu();
-        MenuItem miUpdate = new MenuItem("Update");
+        var cm = new ContextMenu();
+        var miUpdate = new MenuItem("Update");
         miUpdate.setOnAction((ActionEvent event) -> {
             updatingValue = table.getSelectionModel().getSelectedItem();
             isUpdating = true;
             createNewModalStage("Update instance");
         });
-        MenuItem miDelete = new MenuItem("Delete");
+        var miDelete = new MenuItem("Delete");
         miDelete.setOnAction((ActionEvent event) -> {
             Object object = table.getSelectionModel().getSelectedItem();
             table.getItems().remove(object);
@@ -126,15 +127,12 @@ public class Controller {
     }
 
     private Serializer getSerializerByExtension(String extension) {
-        if (extension.equals("bin")) {
-            return new BinarySerializer();
-        } else if (extension.equals("json")) {
-            return new JsonSerializer();
-        } else if (extension.equals("yaml")) {
-            return new YamlSerializer();
-        } else {
-            return null;
-        }
+        return switch(extension) {
+            case "bin" -> new BinarySerializer();
+            case "json" -> new JsonSerializer();
+            case "yaml" -> new YamlSerializer();
+            default -> null;
+        };
     }
 
     private void serializeInstances(Serializer serializer, File file) {
@@ -147,7 +145,7 @@ public class Controller {
     }
 
     private Pair<Serializer, File> getSerializerFromChooser(boolean isSaveMode) {
-        FileChooser fileChooser = new FileChooser();
+        var fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Binary files (*.bin)", "*.bin"),
                 new FileChooser.ExtensionFilter("JSON files (*.json)", "*.json"),

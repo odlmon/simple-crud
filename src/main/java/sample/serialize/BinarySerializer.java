@@ -7,7 +7,7 @@ public class BinarySerializer implements Serializer {
 
     @Override
     public void serialize(Object[] objects, File file) {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
+        try (var oos = new ObjectOutputStream(new FileOutputStream(file))) {
             for (Object object : objects) {
                 oos.writeObject(object);
             }
@@ -18,8 +18,8 @@ public class BinarySerializer implements Serializer {
 
     @Override
     public Object[] deserialize(File file) {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
-            ArrayList<Object> result = new ArrayList<>();
+        try (var ois = new ObjectInputStream(new FileInputStream(file))) {
+            var result = new ArrayList<>();
             Object object;
             while ((object = ois.readObject()) != null) {
                 result.add(object);

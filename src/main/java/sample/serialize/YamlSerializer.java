@@ -43,7 +43,7 @@ public class YamlSerializer implements Serializer {
 
     @Override
     public void serialize(Object[] objects, File file) {
-        try (FileWriter writer = new FileWriter(file)) {
+        try (var writer = new FileWriter(file)) {
             writer.write(Arrays.stream(objects)
                     .map(this::toYaml).collect(Collectors.joining("\n---\n")));
             writer.flush();
@@ -81,12 +81,12 @@ public class YamlSerializer implements Serializer {
             if (c.isEnum()) {
                 return Enum.valueOf(c, lines.poll().split(" ")[1]);
             }
-            Object[] params = new Object[ClassParser.getFieldsCount(c)];
+            var params = new Object[ClassParser.getFieldsCount(c)];
             int i = 0;
             while (!lines.isEmpty()) {
                 String field = lines.poll();
                 if (field.split(" ").length == 1) {
-                    ArrayDeque<String> sublines = new ArrayDeque<>();
+                    var sublines = new ArrayDeque<String>();
                     while ((lines.peek() != null) && lines.peek().startsWith("\t")) {
                         sublines.add(lines.poll().substring(1));
                     }
@@ -113,7 +113,7 @@ public class YamlSerializer implements Serializer {
 
     @Override
     public Object[] deserialize(File file) {
-        try (FileReader reader = new FileReader(file)) {
+        try (var reader = new FileReader(file)) {
             String[] strings = new BufferedReader(reader)
                     .lines()
                     .collect(Collectors.joining("\n"))
