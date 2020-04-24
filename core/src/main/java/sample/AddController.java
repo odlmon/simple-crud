@@ -8,9 +8,9 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import sample.adapter.ComboBoxAdapter;
+import sample.adapter.ControlAdapter;
 import sample.adapter.TextFieldAdapter;
 import sample.annotation.Title;
-import sample.adapter.ControlAdapter;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

@@ -5,6 +5,7 @@ open module Test {
     requires javafx.graphics;
     requires reflections;
     requires com.google.gson;
+    requires plugin;
 
     exports sample;
 }

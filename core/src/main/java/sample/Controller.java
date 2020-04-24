@@ -17,13 +17,22 @@ import sample.serialize.BinarySerializer;
 import sample.serialize.JsonSerializer;
 import sample.serialize.Serializer;
 import sample.serialize.YamlSerializer;
+import service.ObjectCodec;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.module.Configuration;
+import java.lang.module.ModuleDescriptor;
+import java.lang.module.ModuleFinder;
+import java.lang.module.ModuleReference;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.ServiceLoader;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static sample.ClassParser.getAllFields;
 import static sample.ClassParser.getAllTypesOfFields;
@@ -115,8 +124,44 @@ public class Controller {
         });
     }
 
+    private static List<ObjectCodec> getServices(ModuleLayer layer) {
+        return ServiceLoader
+                .load(layer, ObjectCodec.class)
+                .stream()
+                .map(ServiceLoader.Provider::get)
+                .collect(Collectors.toList());
+    }
+
     @FXML
     public void initialize() {
+        Path pluginsDir = Paths.get("core\\plugins");
+
+        // Будем искать плагины в папке plugins
+        ModuleFinder pluginsFinder = ModuleFinder.of(pluginsDir);
+
+        // Пусть ModuleFinder найдёт все модули в папке plugins и вернёт нам список их имён
+        List<String> plugins = pluginsFinder
+                .findAll()
+                .stream()
+                .map(ModuleReference::descriptor)
+                .map(ModuleDescriptor::name)
+                .collect(Collectors.toList());
+
+        // Создадим конфигурацию, которая выполнит резолюцию указанных модулей (проверит корректность графа зависимостей)
+        Configuration pluginsConfiguration = ModuleLayer
+                .boot()
+                .configuration()
+                .resolve(pluginsFinder, ModuleFinder.of(), plugins);
+
+        // Создадим слой модулей для плагинов
+        ModuleLayer layer = ModuleLayer
+                .boot()
+                .defineModulesWithOneLoader(pluginsConfiguration, ClassLoader.getSystemClassLoader());
+
+        // Найдём все реализации сервиса IService в слое плагинов и в слое Boot
+//        List<ObjectCodec> codecs = getServices(layer);
+        ObjectCodec codec = getServices(layer).get(0);
+        codec.encode(new File("core\\plugins\\text.txt"));
         initializeTable();
     }
 

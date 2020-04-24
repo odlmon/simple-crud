@@ -1,8 +1,11 @@
 package sample.motorcyclist;
 
+import sample.ammunition.Boots;
+import sample.ammunition.Helmet;
+import sample.ammunition.Jacket;
+import sample.ammunition.Pants;
 import sample.annotation.Entity;
 import sample.annotation.Title;
-import sample.ammunition.*;
 
 import java.io.Serializable;
 
