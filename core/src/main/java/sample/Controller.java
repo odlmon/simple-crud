@@ -134,7 +134,7 @@ public class Controller {
 
     @FXML
     public void initialize() {
-        Path pluginsDir = Paths.get("core\\plugins");
+        Path pluginsDir = Paths.get("core/plugins");
 
         // Будем искать плагины в папке plugins
         ModuleFinder pluginsFinder = ModuleFinder.of(pluginsDir);
@@ -161,7 +161,7 @@ public class Controller {
         // Найдём все реализации сервиса IService в слое плагинов и в слое Boot
 //        List<ObjectCodec> codecs = getServices(layer);
         ObjectCodec codec = getServices(layer).get(0);
-        codec.encode(new File("core\\plugins\\text.txt"));
+        codec.encode(new File("core/plugins/text.txt"));
         initializeTable();
     }
 
