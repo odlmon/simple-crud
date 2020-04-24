@@ -8,6 +8,7 @@ open module Test {
     requires reflections;
     requires com.google.gson;
     requires plugin;
+    requires commons.codec;
 
     uses ObjectCodec;
 
