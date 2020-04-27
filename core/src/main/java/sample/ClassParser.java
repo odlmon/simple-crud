@@ -25,15 +25,8 @@ public class ClassParser {
     }
 
     public static Constructor getFullConstructor(Class c) {
-        Constructor fullConstructor = null;
         Class[] forCheck = Arrays.stream(getAllFields(c)).map(Field::getType).toArray(Class[]::new);
-        for (Constructor constructor : c.getConstructors()) {
-            if (isFull(constructor, forCheck)) {
-                fullConstructor = constructor;
-                break;
-            }
-        }
-        return fullConstructor;
+        return Arrays.stream(c.getConstructors()).filter(constructor -> isFull(constructor,forCheck)).findFirst().get();
     }
 
     public static String[] getAllClassesInPackage(String packageName) {
