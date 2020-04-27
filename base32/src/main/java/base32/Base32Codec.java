@@ -1,6 +1,7 @@
 package base32;
 
 import org.apache.commons.codec.binary.Base32;
+import service.ExtensionData;
 import service.ObjectCodec;
 
 import java.io.File;
@@ -16,6 +17,7 @@ public class Base32Codec implements ObjectCodec {
         try {
             byte[] encodedSequence = base32.encode(Files.readAllBytes(file.toPath()));
             Files.write(file.toPath(), encodedSequence);
+            file.renameTo(new File(file.getCanonicalPath() + ".b32"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -29,5 +31,10 @@ public class Base32Codec implements ObjectCodec {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public ExtensionData getExtensionData() {
+        return new ExtensionData("Base32 files (*.b32)", "*.b32");
     }
 }

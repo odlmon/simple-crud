@@ -1,5 +1,6 @@
 package base64;
 
+import service.ExtensionData;
 import service.ObjectCodec;
 
 import java.io.File;
@@ -13,6 +14,7 @@ public class Base64Codec implements ObjectCodec {
         try {
             byte[] encodedSequence = Base64.getEncoder().encode(Files.readAllBytes(file.toPath()));
             Files.write(file.toPath(), encodedSequence);
+            file.renameTo(new File(file.getCanonicalPath() + ".b64"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -25,5 +27,10 @@ public class Base64Codec implements ObjectCodec {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public ExtensionData getExtensionData() {
+        return new ExtensionData("Base64 files (*.b64)", "*.b64");
     }
 }
