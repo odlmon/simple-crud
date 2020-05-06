@@ -172,6 +172,16 @@ public class Controller {
                     .filter(itemEntry -> actualItems.contains(itemEntry.getValue()))
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
             setCodec.getItems().retainAll(currentServices.values());
+            List<String> serviceNames = currentServices.keySet().stream()
+                    .map(codec -> codec.getClass().getName())
+                    .collect(Collectors.toList());
+            codecs.forEach(codec -> {
+                if (!serviceNames.contains(codec.getClass().getName())) {
+                    var radio = new RadioMenuItem(codec.getClass().getName());
+                    currentServices.put(codec, radio);
+                    setCodec.getItems().add(radio);
+                }
+            });
         }
         var toggleGroup = new ToggleGroup();
         currentServices.values().forEach(item -> item.setToggleGroup(toggleGroup));
