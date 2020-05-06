@@ -2,7 +2,6 @@ package sample;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -47,6 +46,8 @@ public class Controller {
     public TableView<Object> table;
 
     @FXML
+    private MenuBar menuBar;
+
     private Menu setCodec;
 
     public List<Object> instances = new ArrayList<>();
@@ -154,8 +155,7 @@ public class Controller {
         return loadServices(layer);
     }
 
-    @FXML
-    void onSelect(Event event) {
+    void onSelect() {
         List<ObjectCodec> codecs = getServices("core/plugins");
         if (currentServices.isEmpty()) {
             codecs.forEach(codec -> currentServices.put(codec, new RadioMenuItem(codec.getClass().getName())));
@@ -189,6 +189,11 @@ public class Controller {
 
     @FXML
     public void initialize() {
+        var menuLabel = new Label("Set codec");
+        menuLabel.setOnMouseEntered(mouseEvent -> onSelect());
+        setCodec = new Menu();
+        setCodec.setGraphic(menuLabel);
+        menuBar.getMenus().add(setCodec);
         initializeTable();
     }
 
@@ -199,7 +204,7 @@ public class Controller {
     }
 
     private Serializer getSerializerByExtension(String extension) {
-        return switch(extension) {
+        return switch (extension) {
             case "bin" -> new BinarySerializer();
             case "json" -> new JsonSerializer();
             case "yaml" -> new YamlSerializer();
@@ -233,7 +238,7 @@ public class Controller {
     private Optional<ObjectCodec> getCodecByExtension(FileChooser fileChooser) {
         return currentServices.keySet().stream()
                 .filter(codec -> codec.getExtensionData().format().equals(
-                            fileChooser.getSelectedExtensionFilter().getExtensions().get(0)))
+                        fileChooser.getSelectedExtensionFilter().getExtensions().get(0)))
                 .findFirst();
     }
 

@@ -30,7 +30,7 @@ public class ClassParser {
     }
 
     public static String[] getAllClassesInPackage(String packageName) {
-        return new Reflections("sample")
+        return new Reflections(packageName)
                 .getTypesAnnotatedWith(Entity.class)
                 .stream()
                 .map(Class::getName)

@@ -15,7 +15,6 @@
         <Menu mnemonicParsing="false" text="File">
           <items>
             <MenuItem mnemonicParsing="false" onAction="#addNewInstanceAction" text="Add new instance" />
-                  <Menu fx:id="setCodec" mnemonicParsing="false" onAction="#onSelect" text="Set codec" />
             <MenuItem mnemonicParsing="false" onAction="#onOpenAction" text="Open…" />
                   <MenuItem mnemonicParsing="false" onAction="#onSaveAsAction" text="Save As..." />
             <SeparatorMenuItem mnemonicParsing="false" />
