@@ -270,7 +270,7 @@ public class Controller {
         File finalFile = file;
         objectCodec.ifPresent(codec -> codec.decode(finalFile));
         File newFile = new File(path.substring(0, path.lastIndexOf(".")));
-        file.renameTo(newFile);
+//        file.renameTo(newFile);
         return newFile;
     }
 

@@ -13,6 +13,8 @@
         <module>plugin</module>
         <module>base64</module>
         <module>base32</module>
+        <module>zip</module>
+        <module>sevenzip</module>
     </modules>
 
     <build>
