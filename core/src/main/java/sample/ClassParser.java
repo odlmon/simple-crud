@@ -16,8 +16,13 @@ public class ClassParser {
     }
 
     public static Field[] getAllFields(Class c) {
-        return Stream.concat(Arrays.stream(c.getSuperclass().getDeclaredFields()),
-                Arrays.stream(c.getDeclaredFields())).toArray(Field[]::new);
+        Stream<Field> stream = Stream.empty();
+        stream = Stream.concat(Arrays.stream(c.getDeclaredFields()), stream);
+        Class superClass = c;
+        while (!(superClass = superClass.getSuperclass()).equals(Object.class)) {
+            stream = Stream.concat(Arrays.stream(superClass.getDeclaredFields()), stream);
+        }
+        return stream.toArray(Field[]::new);
     }
 
     public static Class[] getAllTypesOfFields(Class c) {
